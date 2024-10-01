@@ -1,0 +1,183 @@
+.App {
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.App-header h1 {
+  margin: 0;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.charts-container > * {
+  margin: 40px 0;
+}
+
+.heatmap {
+  width: 80%;
+  height: auto;
+  margin: 40px 0;
+}
+
+.react-heatmap-grid {
+  font-size: 11px;
+  border-collapse: separate;
+  border-spacing: 1px;
+}
+
+.react-heatmap-grid .cell {
+  width: 30px;
+  height: 30px;
+  margin: 1px;
+  text-align: center;
+  font-weight: normal;
+}
+
+.recharts-responsive-container {
+  width: 100%;
+  height: auto;
+}
+
+/* Optional: Adjust chart margins and responsiveness */
+
+.heatmap-container {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.heatmap-ylabel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding-right: 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.heatmap-ylabel div {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.heatmap-xlabel {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.heatmap-xlabel div {
+  width: 30px;
+  text-align: center;
+  transform: rotate(-90deg);
+  white-space: nowrap;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.day-selector {
+  display: flex;
+  align-items: center;
+}
+
+.day-selector label {
+  margin-right: 10px;
+}
+
+#day-select {
+  padding: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.hall-checkboxes {
+  display: flex;
+  flex-direction: column;
+}
+
+.hall-checkboxes h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.hall-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.hall-checkbox input {
+  margin-right: 5px;
+}
+
+.graphs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.graphs > div {
+  flex-basis: calc(50% - 10px);
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+  }
+
+  .day-selector {
+    margin-bottom: 20px;
+  }
+
+  .graphs > div {
+    flex-basis: 100%;
+  }
+}
