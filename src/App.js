@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import DayOfTheWeek from "./graphs/DayOfTheWeek";
 import BestTime from "./graphs/bestTime";
 import useLocalStorageState from "./helpers/localStorageState";
@@ -14,6 +14,60 @@ const COLORS = [
   "#775DD0",
   "#3F51B5",
 ];
+
+const getDataForSelectedDay = (data, selectedDay, selectedHalls) => {
+  //First filter data for selected day
+  data = data.filter((record) => record.Timestamp.getDay() === selectedDay);
+  //Then filter for selected halls
+  data.filter((record) => Object.keys(selectedHalls).includes(record.Hall));
+  console.log(data);
+  //Find earliest and latest minutes
+  const earliest = Math.min(
+    ...data.map(
+      (record) =>
+        record.Timestamp.getHours() * 60 + record.Timestamp.getMinutes()
+    )
+  );
+  const latest = Math.max(
+    ...data.map(
+      (record) =>
+        record.Timestamp.getHours() * 60 + record.Timestamp.getMinutes()
+    )
+  );
+
+  const bucketSize = 15;
+  const buckets = [];
+
+  for (let i = earliest; i <= latest; i += bucketSize) {
+    const bucket = data
+      .filter((record) => {
+        const recordMinutes =
+          record.Timestamp.getHours() * 60 + record.Timestamp.getMinutes();
+        return recordMinutes >= i && recordMinutes < i + bucketSize;
+      })
+      .sort((a, b) => a.Timestamp - b.Timestamp);
+    console.log("between", i, i + bucketSize);
+    console.log(bucket);
+    const averages = {};
+    Object.keys(selectedHalls).forEach((hall) => {
+      if (selectedHalls[hall]) {
+        const hallValues = bucket
+          .map((record) => record[hall])
+          .filter((value) => value !== undefined);
+        averages[hall] =
+          hallValues.length > 0
+            ? hallValues.reduce((sum, value) => sum + value, 0) /
+              hallValues.length
+            : 0;
+      }
+    });
+    const date = new Date();
+    date.setHours(Math.floor(i / 60), i % 60, 0, 0);
+    buckets.push({ Timestamp: date, ...averages });
+  }
+  console.log("final buckets", buckets);
+  return buckets;
+};
 
 function App() {
   const [data, setData] = useState([]);
@@ -58,9 +112,9 @@ function App() {
     fetchData();
   }, []);
 
-  const dataForSelectedDay = data.filter(
-    (record) => record.Timestamp.getDay() === selectedDay
-  );
+  const dataForSelectedDay = useMemo(() => {
+    return getDataForSelectedDay(data, selectedDay, selectedHalls);
+  }, [data, selectedDay, selectedHalls]);
 
   const toggleHall = (hall) => {
     setSelectedHalls((prev) => ({ ...prev, [hall]: !prev[hall] }));
