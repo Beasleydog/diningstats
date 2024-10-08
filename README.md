@@ -12,6 +12,7 @@ This project provides real-time statistics about the busyness of University of M
 - Show historical data and trends
 - Predict best times to visit each dining hall
 - Filter and compare different dining locations
+- Input schedule and preferred eating times to get more useful recommendations
 
 ## How It Works
 
