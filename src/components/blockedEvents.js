@@ -14,12 +14,13 @@ const TimeBlockCalendar = ({ events, setEvents }) => {
   const [editingTitle, setEditingTitle] = useState("");
 
   const handleSelect = ({ start, end }) => {
+    console.log(start, end);
     const newEvent = {
       id: String(Date.now()),
-      start: start.getHours() * 60 + start.getMinutes(),
-      end: end.getHours() * 60 + end.getMinutes(),
+      start: new Date(start), // Ensure Date object
+      end: new Date(end), // Ensure Date object
       title: "New Event",
-      dayOfWeek: start.getDay(),
+      // Removed dayOfWeek and time properties for simplicity
     };
     setEvents([...events, newEvent]);
   };
@@ -31,8 +32,8 @@ const TimeBlockCalendar = ({ events, setEvents }) => {
           ev.id === event.id
             ? {
                 ...ev,
-                start: start.getHours() * 60 + start.getMinutes(),
-                end: end.getHours() * 60 + end.getMinutes(),
+                start: new Date(start), // Ensure Date object
+                end: new Date(end), // Ensure Date object
               }
             : ev
         )
@@ -48,9 +49,8 @@ const TimeBlockCalendar = ({ events, setEvents }) => {
           ev.id === event.id
             ? {
                 ...ev,
-                start: start.getHours() * 60 + start.getMinutes(),
-                end: end.getHours() * 60 + end.getMinutes(),
-                dayOfWeek: start.getDay(),
+                start: new Date(start), // Ensure Date object
+                end: new Date(end), // Ensure Date object
               }
             : ev
         )
@@ -113,34 +113,40 @@ const TimeBlockCalendar = ({ events, setEvents }) => {
       localizer.format(date, "dddd", culture),
   };
 
+  // Convert event.start and event.end to Date objects if they aren't already
   const encodedEvents = events.map((event) => {
     const today = new Date();
-    const startOfWeek = today.getDate() - today.getDay();
-
-    const storedStartDate = new Date(event.start);
-    const startDay = storedStartDate.getDay();
-    const startHours = storedStartDate.getHours();
-    const startMinutes = storedStartDate.getMinutes();
-    const newStartDate = new Date();
-    newStartDate.setDate(
-      startOfWeek + ((startDay - newStartDate.getDay() + 7) % 7)
+    const startOfWeek = new Date(
+      today.setDate(today.getDate() - today.getDay())
     );
-    newStartDate.setHours(startHours, startMinutes, 0, 0);
 
-    const storedEndDate = new Date(event.end);
-    const endDay = storedEndDate.getDay();
-    const endHours = storedEndDate.getHours();
-    const endMinutes = storedEndDate.getMinutes();
-    const newEndDate = new Date();
-    newEndDate.setDate(startOfWeek + ((endDay - newEndDate.getDay() + 7) % 7));
-    newEndDate.setHours(endHours, endMinutes, 0, 0);
+    const eventStart = new Date(event.start);
+    const eventEnd = new Date(event.end);
+
+    // Adjust the date to the current week while preserving the day of the week
+    eventStart.setFullYear(
+      startOfWeek.getFullYear(),
+      startOfWeek.getMonth(),
+      startOfWeek.getDate() + eventStart.getDay()
+    );
+    eventEnd.setFullYear(
+      startOfWeek.getFullYear(),
+      startOfWeek.getMonth(),
+      startOfWeek.getDate() + eventEnd.getDay()
+    );
+
+    // Preserve the original time
+    eventStart.setHours(eventStart.getHours(), eventStart.getMinutes());
+    eventEnd.setHours(eventEnd.getHours(), eventEnd.getMinutes());
 
     return {
       ...event,
-      start: newStartDate,
-      end: newEndDate,
+      start: eventStart,
+      end: eventEnd,
     };
   });
+
+  console.log(events, encodedEvents);
 
   return (
     <div style={{ height: "500px", position: "relative" }}>

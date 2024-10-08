@@ -205,7 +205,6 @@ const MealSection = ({
   });
 
   if (availableEntries.length === 0) return null;
-
   const [hours, minutes, period] = prefTimes[section.name.toLowerCase()].start
     .match(/(\d+):(\d+) (\w+)/)
     .slice(1);
@@ -224,7 +223,6 @@ const MealSection = ({
   const eligibleEntries = availableEntries.filter((entry) => {
     const entryHour =
       entry.Timestamp.getHours() + entry.Timestamp.getMinutes() / 60;
-    console.log(entryHour, prefStartHours);
     return entryHour >= prefStartHours;
   });
 

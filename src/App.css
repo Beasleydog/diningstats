@@ -181,3 +181,32 @@
     flex-basis: 100%;
   }
 }
+
+/* Toggle Customization Button */
+.toggle-customization-btn {
+  background-color: #4caf50; /* Green background */
+  border: none;
+  color: white; /* White text */
+  padding: 10px 20px; /* Some padding */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 20px auto; /* Center the button with margin */
+  cursor: pointer;
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s ease;
+}
+
+.toggle-customization-btn:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Improve spacing around customization sections */
+.customization-section {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f9f9f9; /* Light gray background */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}

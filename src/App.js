@@ -74,9 +74,9 @@ function App() {
     []
   );
   const [prefTimes, setPrefTimes] = useLocalStorageState("prefTimes", {
-    breakfast: { start: "08:00", end: "10:30" },
-    lunch: { start: "11:00", end: "14:00" },
-    dinner: { start: "17:00", end: "20:00" },
+    breakfast: { start: "8:00 am", end: "10:30 am" },
+    lunch: { start: "11:00 am", end: "2:00 pm" },
+    dinner: { start: "5:00 pm", end: "8:00 pm" },
   });
   const [selectedHalls, setSelectedHalls] = useLocalStorageState(
     "selectedHalls",
@@ -90,6 +90,8 @@ function App() {
       "Twigs At Oxford": true,
     }
   );
+  const [showCustomizationOptions, setShowCustomizationOptions] =
+    useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -130,13 +132,31 @@ function App() {
     setSelectedDay(Number(e.target.value));
   };
 
+  const toggleCustomizationOptions = () => {
+    setShowCustomizationOptions((prev) => !prev);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         <h1>Dining Hall Traffic</h1>
       </header>
-      <TimeBlockCalendar events={blockedEvents} setEvents={setBlockedEvents} />
-      <PrefTimes prefTimes={prefTimes} setPrefTimes={setPrefTimes} />
+      <div className="graphs">
+        <BestTime
+          selectedHalls={selectedHalls}
+          dataForSelectedDay={dataForSelectedDay}
+          selectedDay={selectedDay}
+          blockedEvents={blockedEvents}
+          prefTimes={prefTimes}
+        />
+        <DayOfTheWeek
+          selectedHalls={selectedHalls}
+          dataForTodaysDayOfWeek={dataForSelectedDay}
+          COLORS={COLORS}
+          selectedDay={selectedDay}
+        />
+      </div>
+
       <div className="controls">
         <div className="day-selector">
           <label htmlFor="day-select">Select Day: </label>
@@ -168,21 +188,23 @@ function App() {
           ))}
         </div>
       </div>
-      <div className="graphs">
-        <BestTime
-          selectedHalls={selectedHalls}
-          dataForSelectedDay={dataForSelectedDay}
-          selectedDay={selectedDay}
-          blockedEvents={blockedEvents}
-          prefTimes={prefTimes}
-        />
-        <DayOfTheWeek
-          selectedHalls={selectedHalls}
-          dataForTodaysDayOfWeek={dataForSelectedDay}
-          COLORS={COLORS}
-          selectedDay={selectedDay}
-        />
-      </div>
+      <br />
+      <button
+        className="toggle-customization-btn"
+        onClick={toggleCustomizationOptions}
+      >
+        {showCustomizationOptions ? "Hide Customization" : "Show Customization"}
+      </button>
+
+      {showCustomizationOptions && (
+        <div className="customization-section">
+          <TimeBlockCalendar
+            events={blockedEvents}
+            setEvents={setBlockedEvents}
+          />
+          <PrefTimes prefTimes={prefTimes} setPrefTimes={setPrefTimes} />
+        </div>
+      )}
     </div>
   );
 }
