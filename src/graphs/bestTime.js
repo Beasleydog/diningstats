@@ -124,7 +124,13 @@ const getHallHours = (hall, day) => {
   return hours[day] || hours[1]; // Default to Monday-Friday schedule if specific day not found
 };
 
-const BestTime = ({ dataForSelectedDay, selectedHalls, selectedDay }) => {
+const BestTime = ({
+  dataForSelectedDay,
+  selectedHalls,
+  selectedDay,
+  blockedEvents,
+  prefTimes,
+}) => {
   return (
     <div
       style={{
@@ -144,13 +150,21 @@ const BestTime = ({ dataForSelectedDay, selectedHalls, selectedDay }) => {
             hall={hall}
             selectedDay={selectedDay}
             dataForSelectedDay={dataForSelectedDay}
+            blockedEvents={blockedEvents}
+            prefTimes={prefTimes}
           />
         ))}
     </div>
   );
 };
 
-const DiningHallSection = ({ hall, selectedDay, dataForSelectedDay }) => {
+const DiningHallSection = ({
+  hall,
+  selectedDay,
+  dataForSelectedDay,
+  blockedEvents,
+  prefTimes,
+}) => {
   return (
     <div style={{ flex: "1 1 300px", maxWidth: "400px" }}>
       <h3>{hall}</h3>
@@ -160,13 +174,21 @@ const DiningHallSection = ({ hall, selectedDay, dataForSelectedDay }) => {
           section={section}
           hall={hall}
           dataForSelectedDay={dataForSelectedDay}
+          blockedEvents={blockedEvents}
+          prefTimes={prefTimes}
         />
       ))}
     </div>
   );
 };
 
-const MealSection = ({ section, hall, dataForSelectedDay }) => {
+const MealSection = ({
+  section,
+  hall,
+  dataForSelectedDay,
+  blockedEvents,
+  prefTimes,
+}) => {
   const sectionData = dataForSelectedDay.filter((entry) => {
     const entryHour =
       entry.Timestamp.getHours() + entry.Timestamp.getMinutes() / 60;
@@ -175,18 +197,57 @@ const MealSection = ({ section, hall, dataForSelectedDay }) => {
 
   if (sectionData.length === 0) return null;
 
-  const lowestCapacityEntry = sectionData.reduce((min, entry) =>
-    entry[hall] < min[hall] ? entry : min
+  const availableEntries = sectionData.filter((entry) => {
+    const entryTime = entry.Timestamp.getTime();
+    return !blockedEvents.some(
+      (event) => entryTime >= event.start && entryTime < event.end
+    );
+  });
+
+  if (availableEntries.length === 0) return null;
+
+  const [hours, minutes, period] = prefTimes[section.name.toLowerCase()].start
+    .match(/(\d+):(\d+) (\w+)/)
+    .slice(1);
+  const prefStartTime = new Date();
+  prefStartTime.setHours(
+    period.toLowerCase() === "pm" && hours !== "12"
+      ? parseInt(hours) + 12
+      : parseInt(hours),
+    parseInt(minutes),
+    0,
+    0
   );
+  const prefStartHours =
+    prefStartTime.getHours() + prefStartTime.getMinutes() / 60;
+
+  const eligibleEntries = availableEntries.filter((entry) => {
+    const entryHour =
+      entry.Timestamp.getHours() + entry.Timestamp.getMinutes() / 60;
+    console.log(entryHour, prefStartHours);
+    return entryHour >= prefStartHours;
+  });
+
+  if (eligibleEntries.length === 0) return null;
+
+  // Sort eligible entries by capacity (ascending) and time (descending)
+  const sortedEntries = eligibleEntries.sort((a, b) => {
+    if (a[hall] !== b[hall]) {
+      return a[hall] - b[hall]; // Sort by capacity (ascending)
+    }
+    return b.Timestamp - a.Timestamp; // If capacity is the same, prefer later times
+  });
+
+  const bestEntry = sortedEntries[0];
 
   return (
     <p>
       {section.name}:{" "}
-      {lowestCapacityEntry.Timestamp.toLocaleTimeString([], {
+      {bestEntry.Timestamp.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       })}{" "}
-      ({lowestCapacityEntry[hall]}% capacity)
+      ({bestEntry[hall]}% capacity)
     </p>
   );
 };

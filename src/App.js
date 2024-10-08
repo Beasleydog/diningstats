@@ -3,7 +3,8 @@ import DayOfTheWeek from "./graphs/DayOfTheWeek";
 import BestTime from "./graphs/bestTime";
 import useLocalStorageState from "./helpers/localStorageState";
 import "./App.css";
-
+import TimeBlockCalendar from "./components/blockedEvents";
+import PrefTimes from "./components/prefTimes";
 const COLORS = [
   "#0088FE",
   "#00C49F",
@@ -20,7 +21,6 @@ const getDataForSelectedDay = (data, selectedDay, selectedHalls) => {
   data = data.filter((record) => record.Timestamp.getDay() === selectedDay);
   //Then filter for selected halls
   data.filter((record) => Object.keys(selectedHalls).includes(record.Hall));
-  console.log(data);
   //Find earliest and latest minutes
   const earliest = Math.min(
     ...data.map(
@@ -46,8 +46,6 @@ const getDataForSelectedDay = (data, selectedDay, selectedHalls) => {
         return recordMinutes >= i && recordMinutes < i + bucketSize;
       })
       .sort((a, b) => a.Timestamp - b.Timestamp);
-    console.log("between", i, i + bucketSize);
-    console.log(bucket);
     const averages = {};
     Object.keys(selectedHalls).forEach((hall) => {
       if (selectedHalls[hall]) {
@@ -65,13 +63,21 @@ const getDataForSelectedDay = (data, selectedDay, selectedHalls) => {
     date.setHours(Math.floor(i / 60), i % 60, 0, 0);
     buckets.push({ Timestamp: date, ...averages });
   }
-  console.log("final buckets", buckets);
   return buckets;
 };
 
 function App() {
   const [data, setData] = useState([]);
   const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+  const [blockedEvents, setBlockedEvents] = useLocalStorageState(
+    "blockedEvents",
+    []
+  );
+  const [prefTimes, setPrefTimes] = useLocalStorageState("prefTimes", {
+    breakfast: { start: "08:00", end: "10:30" },
+    lunch: { start: "11:00", end: "14:00" },
+    dinner: { start: "17:00", end: "20:00" },
+  });
   const [selectedHalls, setSelectedHalls] = useLocalStorageState(
     "selectedHalls",
     {
@@ -129,6 +135,8 @@ function App() {
       <header className="App-header">
         <h1>Dining Hall Traffic</h1>
       </header>
+      <TimeBlockCalendar events={blockedEvents} setEvents={setBlockedEvents} />
+      <PrefTimes prefTimes={prefTimes} setPrefTimes={setPrefTimes} />
       <div className="controls">
         <div className="day-selector">
           <label htmlFor="day-select">Select Day: </label>
@@ -165,6 +173,8 @@ function App() {
           selectedHalls={selectedHalls}
           dataForSelectedDay={dataForSelectedDay}
           selectedDay={selectedDay}
+          blockedEvents={blockedEvents}
+          prefTimes={prefTimes}
         />
         <DayOfTheWeek
           selectedHalls={selectedHalls}
