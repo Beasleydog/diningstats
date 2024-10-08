@@ -4,7 +4,6 @@ This project provides real-time statistics about the busyness of University of M
 
 ![5O1gxYoSPm](https://github.com/user-attachments/assets/96733962-2840-4e56-aac9-cec1b35b4210)
 
-## Check It Out
 [https://beasleydog.github.io/diningstats](https://beasleydog.github.io/diningstats)
 
 ## Features
