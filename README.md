@@ -16,7 +16,9 @@ This project provides real-time statistics about the busyness of University of M
 
 ## How It Works
 
-The application fetches data from a custom API endpoint that mimics the official U-M dining app's internal API. This data is then processed and visualized to provide useful insights for students and staff.
+The backend is a Google Apps Script that populates a Google Sheet (this project started as an exploration with Google Sheet's built-in graphs but then grew) with dining hall capacity data from the U-M mobile app internal dining hall API every 15 minutes.
+
+I used [Charles](https://www.charlesproxy.com/) to intercept requests from my phone, allowing me to capture the API route for dining hall capacity info. With a little bit of inspection I was able to to replicate the (limited) auth when sending requests from my backend.
 
 ## Run Locally
 
